@@ -1,49 +1,37 @@
 class bank():
-    def __init__(self, name, password, balance):
+    def __init__(self, name, balance, password):
         self.name = name
+        self.balance = int(balance)
         self.password = password
-        self.balance = balance
-
-
-    def depo(self, ammount):
-        print("U will deposit ", ammount," euro")
-        self.balance += ammount
-        return self.balance
-
-
-    def disc(self, ammount, password):
+    def deposit(self, amountToDeposit, password):
         if password != self.password:
-            print("Invalid password")
+            print('Sorry, incorrect password')
             return None
-        elif 0 > ammount or ammount > self.balance:
-            print("Incorrect amount to discard")
+        if amountToDeposit < 0:
+            print('You cannot deposit a negative amount')
             return None
-        else:
-            print("Discarded ", ammount," euro")
-            self.balance -= ammount
-            return self.balance
-
-
+        self.balance = self.balance + amountToDeposit
+        return self.balance
+    def withdraw(self, amountToWithdraw, password):
+        if password != self.password:
+            print('Incorrect password for this account')
+            return None
+        if amountToWithdraw < 0:
+            print('You cannot withdraw a negative amount')
+            return None
+        if amountToWithdraw > self.balance:
+            print('You cannot withdraw more than you have in youraccount')
+            return None
+        self.balance = self.balance - amountToWithdraw
+        return self.balance
     def getBalance(self, password):
-        if password == self.password:
-            print("Balance is ", self.balance)
-            return self.balance
-
-
+        if password != self.password:
+            print('Sorry, incorrect password')
+            return None
+        return self.balance
+        # Added for debugging
     def show(self):
+        print(' Name:', self.name)
+        print(' Balance:', self.balance)
+        print(' Password:', self.password)
         print()
-        print("name ", self.name)
-        print("password ", self.password)
-        print("balance ", self.balance)
-        return None
-
-
-acc1 = bank("Alex","qwerty",34)
-acc2 = bank("Michel","poiuyt",90)
-
-
-acc2.depo(43)
-acc1.disc(20,"qwerty")
-
-acc1.show()
-acc2.show()
