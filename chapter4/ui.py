@@ -2,6 +2,7 @@ from controls import manage
 oManage = manage()
 
 while True:
+    print("*** *** ***")
     print("create acc - 1\ncheck balance - 2\ndeposit - 3\nwithdraw - 4\ndelete acc - 5\nshow all users - 0")
 
     act = input()
