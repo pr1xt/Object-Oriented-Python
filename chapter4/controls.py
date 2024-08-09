@@ -12,17 +12,19 @@ class manage():
         self.phone = "123456789"
 
     def askForANum(self):
+        print("*** *** ***")
         print("Enter your number")
         inp = input()
         try:
             inp = int(inp.strip())
         except:
             raise AbortTransaction("Invalid account number")
-        if inp not in self.accountsDict:
+        if str(inp) not in self.accountsDict.keys():
             raise AbortTransaction('There is no account ' + str(inp))
-        return inp
+        return str(inp)
 
     def askForAPassword(self, account):
+        print("*** *** ***")
         print("Enter your password")
         password = input()
         account.checkPassword(password)
@@ -43,10 +45,9 @@ class manage():
         self.nextAccountNumber += 1
 
     def checkBalance(self):
-        print("*** *** ***")
-        print("write down your number and password")
-        inp = list(input().split()[:2])
-        print(f"{self.accountsDict[inp[0]].getBalance(inp[1])}")
+        oAcc = self.askForAcc()
+        theBalance = oAcc.getBalance()
+        print('Your balance is:', theBalance)
 
     def getInfo(self):
         print('Hours:', self.hours)
@@ -55,7 +56,6 @@ class manage():
         print('We currently have', len(self.accountsDict), 'account(s) open.')
 
     def deposit(self):
-        print('*** *** ***')
         oAcc = self.askForAcc()
         depositAmount = input('Please enter amount to deposit: ')
         theBalance = oAcc.deposit(depositAmount)
@@ -63,7 +63,6 @@ class manage():
         print('Your new balance is:', theBalance)
 
     def getMoney(self):
-        print("*** *** ***")
         oAcc = self.askForAcc()
         userAmount = input('Please enter the amount to withdraw: ')
         theBalance = oAcc.withdraw(userAmount)
@@ -71,15 +70,25 @@ class manage():
         print('Your new balance is:', theBalance)
 
     def deleteAcc(self):
-        print("*** *** ***")
-        print("write down your number and password")
-        inp = list(input().split()[:2])
-        amount = self.accountsDict[inp[0]].getBalance(inp[1])
-        self.accountsDict[inp[0]].withdraw(amount, inp[1])
-        del self.accountsDict[inp[0]]
-        print("take all your money: ", amount, ".your account has been deleted")
+        oAcc = self.askForAcc()
+        print('Are you sure, that you want to delete your account? Y/N')
+        if input().lower()[0] == "y":
+            amount = oAcc.getBalance()
+            oAcc.withdraw(amount)
+            print("Your account will be deleted. Enter your number and password one more time ")
+            num = self.askForANum()
+            sAcc = self.askForAcc()
+            if sAcc == oAcc:
+                del self.accountsDict[num]
+                print("Take your money: ", amount)
+            else:
+                raise AbortTransaction("Invalid account")
+        elif input().lower()[0] == "n":
+            pass
+
 
     def showAccs(self):
         print("*** *** ***")
         for i in self.accountsDict.keys():
+            print(i)
             self.accountsDict[i].show()

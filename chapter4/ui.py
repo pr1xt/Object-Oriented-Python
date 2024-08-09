@@ -3,7 +3,8 @@ oManage = manage()
 
 while True:
     print("*** *** ***")
-    print("create acc - 1\ncheck balance - 2\ndeposit - 3\nwithdraw - 4\ndelete acc - 5\nshow all users - 0")
+    print("Create acc - 1\nCheck balance - 2\nDeposit - 3\nWithdraw - 4\nDelete acc - 5"
+          "\nGet bank info - 9\nShow all users - 0")
 
     act = input()
     if act == "1":
@@ -16,6 +17,8 @@ while True:
         oManage.getMoney()
     elif act == "5":
         oManage.deleteAcc()
+    elif act == "9":
+        oManage.getInfo()
     elif act == "0":
         oManage.showAccs()
     else:

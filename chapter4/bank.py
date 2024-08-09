@@ -11,6 +11,7 @@ class bank:
 
     def checkPassword(self, password):
         if password != self.password:
+            print(password, self.password)
             raise AbortTransaction("Invalid password for this account")
 
     def validateAmount(self,amount):
