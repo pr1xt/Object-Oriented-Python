@@ -1,5 +1,6 @@
 # 1 - Import packages
 import pygame
+import pymunk
 from pygame.locals import *
 import sys
 import random
@@ -8,25 +9,54 @@ BLACK = (0, 0, 0)
 red = 255
 green = 255
 blue = 255
+rng = 4
 rad = 14
+color = [red, green, blue]
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 400
 BALL_WIDTH_HEIGHT = rad*2
 MAX_WIDTH = WINDOW_WIDTH - BALL_WIDTH_HEIGHT
 MAX_HEIGHT = WINDOW_HEIGHT - BALL_WIDTH_HEIGHT
-FRAMES_PER_SECOND = 30
-N_PIXELS_PER_FRAME = 3
-rng = 4
+FRAMES_PER_SECOND = 100
+N_PIXELS_PER_FRAME = 1.5
+
 
 pygame.init()
 window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+space = pymunk.Space()
+space.gravity = 0, -1000
 clock = pygame.time.Clock()
 
-ballX = random.randrange(MAX_WIDTH)
-ballY = random.randrange(MAX_HEIGHT)
+body = pymunk.Body()
+body.position = (50,350)
+shape = pymunk.Circle(body,rad)
+shape.density = 1
+space.add(body,shape)
+
+segment_body = pymunk.Body(body_type = pymunk.Body.STATIC)
+segment_shape = pymunk.Segment(segment_body, (0,20), (400,20), 5)
+space.add(segment_body,segment_shape)
+
+
+def convert_coord(point):
+    global WINDOW_HEIGHT
+    return point[0], WINDOW_HEIGHT - point[1]
+# ballX = random.randrange(MAX_WIDTH)
+# ballY = random.randrange(MAX_HEIGHT)
 xSpeed = N_PIXELS_PER_FRAME
 ySpeed = N_PIXELS_PER_FRAME
-ballRect = pygame.Rect(ballX, ballY, BALL_WIDTH_HEIGHT, BALL_WIDTH_HEIGHT)
+# ballRect = pygame.Rect(ballX, ballY, BALL_WIDTH_HEIGHT, BALL_WIDTH_HEIGHT)
+
+def setcolor(rng,r,g,b):
+    new_red = random.randrange(-rng, rng)
+    new_green = random.randrange(-rng, rng)
+    new_blue = random.randrange(-rng, rng)
+    r = (r + new_red)%255
+    g = (g + new_green)%255
+    b = (b + new_blue)%255
+    return r,g,b
+
+
 while True:
 
     # 7 - Check for and handle events
@@ -37,39 +67,21 @@ while True:
             sys.exit()
         if event.type == pygame.MOUSEBUTTONUP:
             #  mouseX, mouseY = event.pos   #  Could do this if we needed it
-            # Check if the click was in the rect of the ball
-            # If so, choose a random new location
-
-            ballRect = pygame.Rect(ballX, ballY, BALL_WIDTH_HEIGHT, BALL_WIDTH_HEIGHT)
+            ballRect = pygame.Rect(ballX-rad, ballY-rad, BALL_WIDTH_HEIGHT, BALL_WIDTH_HEIGHT)
             if ballRect.collidepoint(event.pos):
-                ballX = random.randrange(MAX_WIDTH)
-                ballY = random.randrange(MAX_HEIGHT)
+                body.position = (random.randrange(MAX_WIDTH), random.randrange(MAX_HEIGHT))
                 ballRect = pygame.Rect(ballX, ballY, BALL_WIDTH_HEIGHT, BALL_WIDTH_HEIGHT)
-    if (ballX < 0) or (ballX >= MAX_WIDTH):
-        xSpeed = -xSpeed  # reverse X direction
 
-    if (ballY < 0) or (ballY >= MAX_HEIGHT):
-        ySpeed = -ySpeed  # reverse Y direction
-
-        # Update the ball's location, using the speed in two directions
-    ballX = ballX + xSpeed
-    ballY = ballY + ySpeed
-
-    new_red = random.randrange(-rng,rng)
-    new_green = random.randrange(-rng,rng)
-    new_blue = random.randrange(-rng,rng)
-
-    red = (red + new_red)%255
-    green = (green + new_green)%255
-    blue = (blue + new_blue)%255
-
-    color = [red,green,blue]
+    ballX, ballY = convert_coord(body.position)
+    color = setcolor(rng,color[0],color[1],color[2])
     window.fill((0,0,0))
-    pygame.draw.circle(window, color,(ballX+rad, ballY+rad),rad,width=5)
+    pygame.draw.circle(window, color,(int(ballX), int(ballY)),rad,width=5)
+    pygame.draw.line(window,(255,255,255),convert_coord((0,20)),convert_coord((400,20)), 5)
 
     # 10 - Draw all window elements
     # 11 - Update the window
     pygame.display.update()
 
     # 12 - Slow things down a bit
+    space.step(1/FRAMES_PER_SECOND)
     clock.tick(FRAMES_PER_SECOND)  # make pygame wait
