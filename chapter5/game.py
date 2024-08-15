@@ -10,7 +10,7 @@ red = 255
 green = 255
 blue = 255
 rng = 4
-rad = 14
+rad = 18
 color = [red, green, blue]
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 400
@@ -31,18 +31,28 @@ body = pymunk.Body()
 body.position = (50,350)
 shape = pymunk.Circle(body,rad)
 shape.density = 1
+shape.elasticity = 1
 space.add(body,shape)
 
 segment_body = pymunk.Body(body_type = pymunk.Body.STATIC)
 segment_shape = pymunk.Segment(segment_body, (0,20), (400,20), 5)
+segment_shape.elasticity = 0.5
 space.add(segment_body,segment_shape)
 
-
+class createShape:
+    def __init__(self, p0=(10, 10), p1=(690, 230), d=2):
+        x0, y0 = p0
+        x1, y1 = p1
+        pts = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+        for i in range(4):
+            segment = pymunk.Segment(space.static_body, pts[i], pts[(i+1)%4], d)
+            segment.elasticity = 1
+            segment.friction = 1
+            space.add(segment)
+createShape()
 def convert_coord(point):
     global WINDOW_HEIGHT
     return point[0], WINDOW_HEIGHT - point[1]
-# ballX = random.randrange(MAX_WIDTH)
-# ballY = random.randrange(MAX_HEIGHT)
 xSpeed = N_PIXELS_PER_FRAME
 ySpeed = N_PIXELS_PER_FRAME
 # ballRect = pygame.Rect(ballX, ballY, BALL_WIDTH_HEIGHT, BALL_WIDTH_HEIGHT)
@@ -75,8 +85,8 @@ while True:
     ballX, ballY = convert_coord(body.position)
     color = setcolor(rng,color[0],color[1],color[2])
     window.fill((0,0,0))
-    pygame.draw.circle(window, color,(int(ballX), int(ballY)),rad,width=5)
-    pygame.draw.line(window,(255,255,255),convert_coord((0,20)),convert_coord((400,20)), 5)
+    pygame.draw.circle(window, color,(int(ballX), int(ballY)),rad,width=6)
+    pygame.draw.line(window,(255,255,255),convert_coord((0,20)),convert_coord((400,20)), 9)
 
     # 10 - Draw all window elements
     # 11 - Update the window
